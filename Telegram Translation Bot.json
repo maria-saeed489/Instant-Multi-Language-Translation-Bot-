@@ -1,0 +1,141 @@
+{
+  "name": "Telegram Translation Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "You are a translation assistant. Detect the language of the input text and translate it to English. If the text is already in English, just return it as is. Only return the translated text, nothing else."
+        }
+      },
+      "id": "34a3f368-e6ad-477e-a13a-d6d9b340306e",
+      "name": "Translate to English",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        400,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {
+          "messageStatusUpdates": [
+            "all"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        176,
+        288
+      ],
+      "id": "7abbba25-bf71-4efa-b8c4-f888f3110bd8",
+      "name": "WhatsApp Trigger",
+      "webhookId": "ee427ec2-4fa8-415d-9926-36f65a40d5d4",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "ys5fTfwkIopC2uh3",
+          "name": "WhatsApp OAuth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1063233746874671",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "id": "2c4f9a9b-e37d-4918-9d3b-ed365c20123f",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        752,
+        288
+      ],
+      "webhookId": "c7103326-104d-40dc-ae4b-dc8794b80222",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "KBB3t8BaVv1JhMib",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        448,
+        528
+      ],
+      "id": "e18d0b95-b97d-44b4-bd06-112a1c8da9b2",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "BBYakkEeENUjUSQe",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Translate to English": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Translate to English",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Translate to English",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0eab3882-e3b8-4605-8673-e5dab8035764",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0be941bb197725024f38f2f9b98c7bcbd90ab5bcee4ad4e10eaf8861faea5c94"
+  },
+  "id": "XVIS4G3r7aX236Uq",
+  "tags": []
+}
